@@ -15,6 +15,7 @@
     <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.CoreModule.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Assembly-CSharp-firstpass.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/IFSCL.Runtime.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Independant.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Unity.TextMeshPro.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Cinemachine.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.CrashReportingModule.dll" />
