@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Game Condition="'$(Game)' == ''">$(HOME)/.local/share/Kolossus/app/IFSCL</Game>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(Game)/BepInEx/core/BepInEx.dll" />
+    <Reference Include="$(Game)/BepInEx/core/0Harmony.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.CoreModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Assembly-CSharp-firstpass.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/IFSCL.Runtime.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Unity.TextMeshPro.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Cinemachine.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.CrashReportingModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Translations.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.InputLegacyModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.UI.dll" />
+  </ItemGroup>
+  <Target Name="Deploy" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(Game)/BepInEx/scripts" />
+  </Target>
+</Project>
