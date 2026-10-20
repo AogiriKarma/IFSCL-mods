@@ -36,6 +36,7 @@ public class DevConsole : MonoBehaviour
         if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter) && input.Length > 0)
         {
             Print("> " + input);
+            Commands.Execute(input, Print);
             input = "";
             e.Use();
         }
