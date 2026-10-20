@@ -5,80 +5,116 @@ using UnityEngine;
 
 namespace IfsclMods.Console;
 
-// Quake-style overlay console. Lives on the plugin's GameObject, so a hot reload recreates it.
+// Console controller: key toggle, game freeze, transcript, command history, and the two views
+// (the game's terminal window, or a plain IMGUI overlay when Console/TerminalSkin is off).
 public class DevConsole : MonoBehaviour
 {
     public static ConfigEntry<KeyCode> Key;
+    public static ConfigEntry<bool> Skin;
 
     bool open;
-    string input = "";
-    readonly List<string> lines = new();
+    readonly List<string> blocks = new();   // newest first, one block per command
+    int scroll;                             // newest blocks hidden
     readonly List<string> history = new();
-    int historyIndex; // == history.Count when editing a fresh line
-    Vector2 scroll;
+    int historyIndex;                       // == history.Count when editing a fresh line
+    string imguiInput = "";
+    Vector2 imguiScroll;
 
-    public void Print(string text) => lines.Add(text);
+    void Awake()
+    {
+        TerminalWindow.OnSubmit = Submit;
+        TerminalWindow.OnBuilt = RenderWindow;
+        Skin.SettingChanged += (_, _) => { if (open) ApplyView(); };
+    }
+
+    public void Print(string block)
+    {
+        blocks.Insert(0, block);
+        if (blocks.Count > 500) blocks.RemoveAt(blocks.Count - 1);
+        scroll = 0;
+        RenderWindow();
+    }
+
+    void RenderWindow() => TerminalWindow.Render(blocks, scroll);
+
+    void ApplyView()
+    {
+        if (Skin.Value) { TerminalWindow.Show(); RenderWindow(); }
+        else TerminalWindow.Hide();
+    }
 
     void SetOpen(bool on)
     {
         open = on;
-        if (on) Freeze.Acquire(); else Freeze.Release();
+        if (on) { Freeze.Acquire(); ApplyView(); }
+        else { TerminalWindow.Hide(); Freeze.Release(); }
     }
 
     void OnDisable() { if (open) SetOpen(false); } // hot reload or quit while open: give the game back
+    void OnDestroy() => TerminalWindow.DestroyAll();
 
-    void Submit()
+    // One block per command so a multi-line output reads top-down even with newest-first display.
+    void Submit(string line)
     {
-        Print("> " + input);
-        history.Add(input);
+        history.Add(line);
         historyIndex = history.Count;
-        Commands.Execute(input, Print);
-        input = "";
+        var block = new List<string> { "<color=white>> " + line + "</color>" };
+        Commands.Execute(line, block.Add);
+        Print(string.Join("\n", block));
     }
 
+    void Scroll(int delta)
+    {
+        scroll = Mathf.Clamp(scroll + delta, 0, Mathf.Max(0, blocks.Count - 1));
+        RenderWindow();
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(Key.Value)) { SetOpen(!open); return; }
+        if (!open) return;
+
+        if (Skin.Value && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))) TerminalWindow.SubmitCurrent();
+
+        float wheel = Input.mouseScrollDelta.y;
+        if (wheel > 0f || Input.GetKeyDown(KeyCode.PageUp)) Scroll(+1);
+        if (wheel < 0f || Input.GetKeyDown(KeyCode.PageDown)) Scroll(-1);
+
+        if (Input.GetKeyDown(KeyCode.UpArrow) && historyIndex > 0) SetInput(history[--historyIndex]);
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (historyIndex < history.Count - 1) SetInput(history[++historyIndex]);
+            else { historyIndex = history.Count; SetInput(""); }
+        }
+    }
+
+    void SetInput(string text) { if (Skin.Value) TerminalWindow.SetInput(text); else imguiInput = text; }
+
+    // Plain overlay view: oldest at the top, newest right above the input, like a classic console.
     void OnGUI()
     {
+        if (!open || Skin.Value) return;
         var e = Event.current;
-        // Toggle on the IMGUI event, and consume it so the text field never sees the key.
-        if (e.type == EventType.KeyDown && e.keyCode == Key.Value) { SetOpen(!open); e.Use(); return; }
-        if (!open) return;
+        if (e.type == EventType.KeyDown && e.keyCode == Key.Value) { e.Use(); return; } // Update handles the toggle
 
         float h = Screen.height * 0.4f;
         GUI.Box(new Rect(0, 0, Screen.width, h), "");
+        var style = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 14 };
 
-        // Scrollback: newest line at the bottom, auto-scrolled.
-        scroll.y = float.MaxValue;
-        scroll = GUILayout.BeginScrollView(scroll, GUILayout.Width(Screen.width), GUILayout.Height(h - 30));
-        GUILayout.FlexibleSpace(); // pins the lines to the bottom, right above the input
-        foreach (var l in lines) GUILayout.Label(l);
+        imguiScroll.y = float.MaxValue;
+        imguiScroll = GUILayout.BeginScrollView(imguiScroll, GUILayout.Width(Screen.width), GUILayout.Height(h - 30));
+        GUILayout.FlexibleSpace();
+        for (int i = blocks.Count - 1; i >= scroll; i--) GUILayout.Label(blocks[i], style);
         GUILayout.EndScrollView();
 
-        if (e.type == EventType.KeyDown)
+        if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
         {
-            switch (e.keyCode)
-            {
-                case KeyCode.Return:
-                case KeyCode.KeypadEnter:
-                    if (input.Length > 0) Submit();
-                    e.Use();
-                    break;
-                case KeyCode.UpArrow:
-                    if (historyIndex > 0) input = history[--historyIndex];
-                    e.Use();
-                    break;
-                case KeyCode.DownArrow:
-                    if (historyIndex < history.Count - 1) input = history[++historyIndex];
-                    else { historyIndex = history.Count; input = ""; }
-                    e.Use();
-                    break;
-            }
+            if (imguiInput.Length > 0) Submit(imguiInput);
+            imguiInput = "";
+            e.Use();
         }
-
         GUI.SetNextControlName("console_input");
-        input = GUI.TextField(new Rect(0, h - 25, Screen.width, 25), input);
+        imguiInput = GUI.TextField(new Rect(0, h - 25, Screen.width, 25), imguiInput);
         GUI.FocusControl("console_input");
-        // Keep the caret at the end after history navigation.
-        if (GUIUtility.keyboardControl != 0 && GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl) is TextEditor te && te.cursorIndex > input.Length)
-            te.cursorIndex = te.selectIndex = input.Length;
     }
 }

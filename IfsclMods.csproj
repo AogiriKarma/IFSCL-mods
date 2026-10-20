@@ -16,6 +16,14 @@
     <Reference Include="$(Game)/IFSCL_Data/Managed/Assembly-CSharp-firstpass.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/IFSCL.Runtime.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Independant.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/DOTween.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.AudioModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.AnimationModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/DOTween.Modules.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.UIModule.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/IFSCL.Programs.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Unity.Addressables.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/Unity.ResourceManager.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Unity.TextMeshPro.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/Cinemachine.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.CrashReportingModule.dll" />

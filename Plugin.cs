@@ -25,7 +25,9 @@ public class Plugin : BaseUnityPlugin
         Config.Bind("Debug", "TestKey", KeyCode.K, "Test key capture.");
         Config.Bind("Debug", "Speed", 1.5f, new ConfigDescription("Test float slider.", new AcceptableValueRange<float>(0.5f, 3f)));
         Config.Bind("Debug", "Name", "Karma", "Test string (display only).");
-        DevConsole.Key = Config.Bind("General", "ConsoleKey", KeyCode.F2, "Open the console.");
+        TerminalWindow.DestroyAll(); // hot reload: a window built by the previous assembly may still be on screen
+        DevConsole.Key = Config.Bind("Console", "Key", KeyCode.F2, "Open the console.");
+        DevConsole.Skin = Config.Bind("Console", "TerminalSkin", true, "Use the game's terminal window for the console. Off = plain overlay, more readable.");
         gameObject.AddComponent<DevConsole>();
         BuiltinCommands.RegisterAll();
         harmony = new Harmony("ch.aogirikarma.ifsclmods");

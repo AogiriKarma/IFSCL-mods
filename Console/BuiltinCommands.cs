@@ -13,18 +13,18 @@ static class BuiltinCommands
 {
     public static void RegisterAll()
     {
-        Commands.Register("help", "List commands.", (_, print) =>
+        Commands.Register("help", "list commands.", (_, print) =>
         {
-            foreach (var (n, h) in Commands.List()) print($"{n}  -  {h}");
+            foreach (var (n, h) in Commands.List()) print($"<color=white>{n}</color>  {h}");
         });
 
-        Commands.Register("mods", "List loaded mods.", (_, print) =>
+        Commands.Register("mods", "list loaded mods.", (_, print) =>
         {
             foreach (var p in Chainloader.PluginInfos.Values.OrderBy(p => p.Metadata.Name))
                 print($"{p.Metadata.Name} v{p.Metadata.Version}  [{p.Metadata.GUID}]");
         });
 
-        Commands.Register("get", "get <guid> [section.key]  -  Show a mod's config.", (args, print) =>
+        Commands.Register("get", "<guid> [section.key]: show a mod's config.", (args, print) =>
         {
             if (!TryPlugin(args, print, out var cfg)) return;
             foreach (var kv in cfg)
@@ -32,7 +32,7 @@ static class BuiltinCommands
                     print($"{kv.Key.Section}.{kv.Key.Key} = {kv.Value.BoxedValue}");
         });
 
-        Commands.Register("set", "set <guid> <section.key> <value>  -  Change a config value.", (args, print) =>
+        Commands.Register("set", "<guid> <section.key> <value>: change a config value.", (args, print) =>
         {
             if (args.Length < 3) { print("Usage: set <guid> <section.key> <value>"); return; }
             if (!TryPlugin(args, print, out var cfg)) return;
@@ -42,7 +42,15 @@ static class BuiltinCommands
             print($"{args[1]} = {entry.BoxedValue}");
         });
 
-        Commands.Register("lang", "lang <en|fr|it|es|pl|pt>  -  Show or switch the game language.", (args, print) =>
+        Commands.Register("skin", "[on|off]: use the game's terminal window or the plain overlay.", (args, print) =>
+        {
+            if (args.Length > 0) DevConsole.Skin.Value = args[0] == "on" || args[0] == "true" || args[0] == "1";
+            print("Terminal skin: " + (DevConsole.Skin.Value ? "on" : "off"));
+        });
+
+        Commands.Register("uidump", "debug: log the console window hierarchy.", (_, print) => TerminalWindow.Dump(print));
+
+        Commands.Register("lang", "[en|fr|it|es|pl|pt]: show or switch the game language.", (args, print) =>
         {
             if (args.Length == 0) { print(VarG.langage); return; }
             int i = Array.IndexOf(VarG.langagesListe, args[0]);
@@ -53,6 +61,7 @@ static class BuiltinCommands
             VarG.OnLangageChanged();
             SaveGameManager.SaveSettingsAndProfile();
             MenuBase.GetCurrent()?.Initialisation(MenuBase.currentMenuMode, simpleReset: true);
+            TerminalWindow.RefreshTexts();
             print("Language: " + VarG.langage);
         });
     }

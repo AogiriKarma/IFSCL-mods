@@ -20,6 +20,19 @@ It adds a **Mods** button to the main menu. From there you can see every install
 
 Mods go into `BepInEx/plugins/` as well.
 
+## Console
+
+Press **F2** (configurable) to open the console, drawn as a genuine IFSCL program window. The game is frozen while it is open. Built-in commands: `help`, `mods`, `get`, `set`, `lang`, `skin on|off` (plain overlay instead of the game window). Mouse wheel scrolls, arrows recall history.
+
+Mods register their own commands:
+
+```csharp
+using IfsclMods.Console;
+Commands.Register("spawn", "<monster>: spawn a monster on Lyoko.", (args, print) => print("..."));
+```
+
+Need to freeze the game for your own overlay? `Freeze.Acquire()` / `Freeze.Release()` (reference counted) does what the game does for its bug-report form.
+
 ## Write a mod
 
 A mod is a regular BepInEx plugin. Reference `IfsclMods.dll` to get the attributes below.
