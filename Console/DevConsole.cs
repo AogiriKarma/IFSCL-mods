@@ -71,7 +71,7 @@ public class DevConsole : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(Key.Value)) { SetOpen(!open); return; }
+        if (Input.GetKeyDown(Key.Value) && (Skin.Value || !open)) { SetOpen(!open); return; } // plain view closes from OnGUI
         if (!open) return;
 
         if (Skin.Value && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))) TerminalWindow.SubmitCurrent();
@@ -95,7 +95,8 @@ public class DevConsole : MonoBehaviour
     {
         if (!open || Skin.Value) return;
         var e = Event.current;
-        if (e.type == EventType.KeyDown && e.keyCode == Key.Value) { e.Use(); return; } // Update handles the toggle
+        // A focused IMGUI text field swallows keys before Input sees them: close from the event here.
+        if (e.type == EventType.KeyDown && e.keyCode == Key.Value) { SetOpen(false); e.Use(); return; }
 
         float h = Screen.height * 0.4f;
         GUI.Box(new Rect(0, 0, Screen.width, h), "");
