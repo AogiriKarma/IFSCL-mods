@@ -27,7 +27,7 @@ public class Plugin : BaseUnityPlugin
         Config.Bind("Debug", "Name", "Karma", "Test string (display only).");
         DevConsole.Key = Config.Bind("General", "ConsoleKey", KeyCode.F2, "Open the console.");
         gameObject.AddComponent<DevConsole>();
-        Commands.Register("help", "List commands.", (_, print) => { foreach (var (n, h) in Commands.List()) print($"{n}  -  {h}"); });
+        BuiltinCommands.RegisterAll();
         harmony = new Harmony("ch.aogirikarma.ifsclmods");
         harmony.PatchAll();
         Lang.OptionName("mods", "Mods", "Mods", "Mod", "Mods", "Mody", "Mods");

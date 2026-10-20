@@ -37,10 +37,13 @@ static class ModsButtonInjector
             if (!before && parent.GetComponent<LayoutGroup>() == null)
             {
                 var rt = (RectTransform)clone;
-                rt.anchoredPosition = ((RectTransform)src.transform).anchoredPosition + Vector2.down * rt.rect.height;
+                var tmp = src.GetComponentInChildren<TMPro.TMP_Text>();
+                float row = tmp != null ? tmp.preferredHeight : rt.rect.height;
+                rt.anchoredPosition = ((RectTransform)src.transform).anchoredPosition + Vector2.down * row;
             }
-            clone.GetComponent<ButtonLine>().SetContent(BtnLineStatus.Init, word);
         }
+        // Init through the game's own path so our Call prefix builds the full text.
+        clone.GetComponent<ButtonLine>().DoBtnAction(BtnLineStatus.Init);
         clone.gameObject.SetActive(src.gameObject.activeSelf);
     }
 }
