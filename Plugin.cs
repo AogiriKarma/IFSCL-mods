@@ -29,28 +29,13 @@ public class Plugin : BaseUnityPlugin
         Lang.OptionName("mods", "Mods", "Mods", "Mod", "Mods", "Mody", "Mods");
         Lang.OptionName("TestKey", "Test key", "Touche de test");
         Lang.OptionDescr("TestKey", "Press to rebind.", "Cliquer pour réassigner.");
-        Lang.Word("modded", "modded", "moddé", "moddato", "modeado", "zmodowany", "modificado");
+        Lang.OptionName("moddedWith", "Modded with", "Moddé avec", "Moddato con", "Modeado con", "Zmodowane z", "Modificado com");
         CrashReportHandler.enableCaptureExceptions = false;
     }
 
     // Called by ScriptEngine on reload (F6): remove patches so they do not stack up.
     void OnDestroy() => harmony?.UnpatchSelf();
 
-    [HarmonyPatch(typeof(MenuBase), "SetTitle")]
-    class TitlePatch
-    {
-        static void Postfix(MenuBase __instance)
-        {
-            if (MenuBase.currentMenuMode == MenuBaseModes.main)
-            {
-                __instance.title.text += " " + MSG.GetWord("modded");
-                __instance.title.enableAutoSizing = true;
-                __instance.title.fontSizeMin = 20;
-                __instance.title.fontSizeMax = __instance.title.fontSize;
-                __instance.title.enableWordWrapping = false;
-            }
-        }
-    }
 
     // Back button on a config page returns to the mods list.
     [HarmonyPatch(typeof(MenuBase), nameof(MenuBase.DoButtonActionPerMenu))]

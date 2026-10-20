@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Game install path: default is the Kolossus launcher location, override it in Game.local.props (not versioned). -->
+  <Import Project="Game.local.props" Condition="Exists('Game.local.props')" />
+  <PropertyGroup>
+    <Game Condition="'$(Game)' == ''">$(HOME)/.local/share/Kolossus/app/IFSCL</Game>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Game Condition="'$(Game)' == ''">$(HOME)/.local/share/Kolossus/app/IFSCL</Game>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="$(Game)/BepInEx/core/BepInEx.dll" />

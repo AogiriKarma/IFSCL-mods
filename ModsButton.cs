@@ -1,32 +1,47 @@
 using System.Linq;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using IFSCL;
 using IFSCL.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
+// Two cloned main-menu buttons: "Mods" next to Credits, and a "Modded with" line under "Created by".
 [HarmonyPatch(typeof(MenuBase), nameof(MenuBase.Initialisation))]
 static class ModsButtonInjector
 {
-    const string Name = "ModsButton";
+    public const string ModsName = "ModsButton";
+    public const string ModdedName = "ModdedByLine";
 
-    static void Postfix(MenuBase __instance, MenuBaseModes newMainMenuMode)
+    static void Postfix(MenuBase __instance)
     {
         if (__instance is not MenuBaseMain main) return;
+        Clone(main, BtnLineAction.Credits, ModsName, "mods", before: true);
+        Clone(main, BtnLineAction.CreatedBy, ModdedName, "moddedWith", before: false);
+    }
 
-        var credits = main.listeButtonMainTiles.FirstOrDefault(b => b.enm == BtnLineAction.Credits);
-        if (credits == null) return;
+    static void Clone(MenuBaseMain main, BtnLineAction source, string name, string word, bool before)
+    {
+        var src = main.listeButtonMainTiles.FirstOrDefault(b => b.enm == source)
+                  ?? Object.FindObjectsOfType<ButtonLine>(true).FirstOrDefault(b => b.enm == source);
+        if (src == null) return;
 
-        var parent = credits.transform.parent;
-        var mods = parent.Find(Name);
-        if (mods == null)
+        var parent = src.transform.parent;
+        var clone = parent.Find(name);
+        if (clone == null)
         {
-            mods = Object.Instantiate(credits.gameObject, parent).transform;
-            mods.name = Name;
-            mods.SetSiblingIndex(credits.transform.GetSiblingIndex());
-            mods.GetComponent<ButtonLine>().SetContent(BtnLineStatus.Init, "mods");
+            clone = Object.Instantiate(src.gameObject, parent).transform;
+            clone.name = name;
+            clone.SetSiblingIndex(src.transform.GetSiblingIndex() + (before ? 0 : 1));
+            // Without a layout group the clone would sit on top of its source: push it one row down.
+            if (!before && parent.GetComponent<LayoutGroup>() == null)
+            {
+                var rt = (RectTransform)clone;
+                rt.anchoredPosition = ((RectTransform)src.transform).anchoredPosition + Vector2.down * rt.rect.height;
+            }
+            clone.GetComponent<ButtonLine>().SetContent(BtnLineStatus.Init, word);
         }
-        // Follow the credits button visibility (hidden in sub-menus like Options).
-        mods.gameObject.SetActive(credits.gameObject.activeSelf);
+        clone.gameObject.SetActive(src.gameObject.activeSelf);
     }
 }
 
@@ -35,10 +50,22 @@ static class ModsButtonAction
 {
     static bool Prefix(MenuButton _b, BtnLineStatus blAction, ref MenuBaseModes __result)
     {
-        if (_b.name != "ModsButton") return true;
+        switch (_b.name)
+        {
+            case ModsButtonInjector.ModsName:
+                if (blAction == BtnLineStatus.LeftClick) __result = ModsMenu.Mode;
+                else _b.SetContent(blAction, "mods");
+                return false;
 
-        if (blAction == BtnLineStatus.LeftClick) __result = ModsMenu.Mode;
-        else _b.SetContent(blAction, "mods");
-        return false;
+            case ModsButtonInjector.ModdedName:
+                if (blAction == BtnLineStatus.LeftClick) MenuBase.OpenDPUrl("https://github.com/AogiriKarma/IFSCL-mods");
+                else
+                {
+                    var me = Chainloader.PluginInfos["ch.aogirikarma.ifsclmods"].Metadata;
+                    _b.SetContent(blAction, "moddedWith", $"{me.Name} v{me.Version} ({Chainloader.PluginInfos.Count} mods)");
+                }
+                return false;
+        }
+        return true;
     }
 }
