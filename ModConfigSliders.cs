@@ -65,7 +65,7 @@ static class ModConfigSliders
         var line = main.listButtonLines.Find(b => b != null)?.GetComponent<RectTransform>();
         var vlg = main.layoutLines.GetComponent<VerticalLayoutGroup>();
         float pitch = (line != null ? line.rect.height : 40f) + (vlg != null ? vlg.spacing : 0f);
-        int extra = ModConfigMenu.Entries.Count;
+        int extra = ModConfigMenu.Entries.Count + 1; // one blank line between text lines and sliders, like the Audio menu
         var rt = container.GetComponent<RectTransform>();
         rt.anchoredPosition = main.audioLayout.GetComponent<RectTransform>().anchoredPosition + Vector2.down * (extra * pitch);
     }
