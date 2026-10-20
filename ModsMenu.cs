@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
+using BepInEx.Configuration;
 using HarmonyLib;
 using IFSCL;
 using IFSCL.UI;
@@ -14,6 +15,10 @@ static class ModsMenu
 
     public static List<PluginInfo> Plugins =>
         Chainloader.PluginInfos.Values.OrderBy(p => p.Metadata.Name).ToList();
+
+    // Convention: a mod with a bool "General/Enabled" config entry can be toggled from the list.
+    public static ConfigEntryBase EnabledEntry(PluginInfo p) =>
+        p.Instance?.Config.TryGetEntry<bool>("General", "Enabled", out var e) == true ? e : null;
 
     public static string DescriptionOf(PluginInfo p)
     {
@@ -76,7 +81,10 @@ static class ModsMenu_Lines
             return; 
         }
 
-        bl.SetContent(blAction, p.Metadata.Name, "v" + p.Metadata.Version, translateFirstWord: false);
+        var enabled = ModsMenu.EnabledEntry(p);
+        if (blAction == BtnLineStatus.RightClick && enabled != null) enabled.BoxedValue = !(bool)enabled.BoxedValue;
+        string value = enabled == null ? "v" + p.Metadata.Version : MSG.GetWord((bool)enabled.BoxedValue ? "yes" : "no");
+        bl.SetContent(blAction, p.Metadata.Name, value, translateFirstWord: false);
         if (blAction == BtnLineStatus.Enter)
             MenuBase.GetCurrent().descr.SetDescription(ModsMenu.DescriptionOf(p), buttonEnabled: true, delete: false, null, alreadyTranslated: true);
     }

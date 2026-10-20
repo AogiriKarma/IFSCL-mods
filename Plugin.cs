@@ -19,7 +19,6 @@ public class Plugin : BaseUnityPlugin
     void Awake()
     {
         Logger.LogInfo("IFSCL Mods loaded");
-        Config.Bind("General", "Enabled", true, "Enable the shell.");
         Config.Bind("General", "Theme", Theme.Classic, "Shell color theme.");
         Config.Bind("Debug", "Volume", 50, new ConfigDescription("Test int.", new AcceptableValueRange<int>(0, 100)));
         Config.Bind("Debug", "TestKey", KeyCode.K, "Test key capture.");
