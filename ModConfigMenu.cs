@@ -131,3 +131,15 @@ static class ModConfigMenu_KeyCapture
         return false;
     }
 }
+
+// Back button on a config page returns to the mods list.
+[HarmonyPatch(typeof(MenuBase), nameof(MenuBase.DoButtonActionPerMenu))]
+static class ModConfigMenu_Back
+{
+    static bool Prefix(MenuBase __instance, MenuButton bl, BtnLineStatus blAction)
+    {
+        if (MenuBase.currentMenuMode != ModConfigMenu.Mode || bl.enm != BtnLineAction.Back || blAction != BtnLineStatus.LeftClick) return true;
+        __instance.Initialisation(ModsMenu.Mode);
+        return false;
+    }
+}
