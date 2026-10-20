@@ -21,6 +21,7 @@
     <Reference Include="$(Game)/IFSCL_Data/Managed/Translations.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.InputLegacyModule.dll" />
     <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.UI.dll" />
+    <Reference Include="$(Game)/IFSCL_Data/Managed/UnityEngine.IMGUIModule.dll" />
   </ItemGroup>
   <Target Name="Deploy" AfterTargets="Build">
     <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb" DestinationFolder="$(Game)/BepInEx/scripts" />

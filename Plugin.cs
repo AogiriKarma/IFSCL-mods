@@ -4,6 +4,7 @@ using IFSCL;
 using IFSCL.UI;
 using UnityEngine.CrashReportHandler;
 using IfsclMods.Api;
+using IfsclMods.Console;
 using BepInEx.Configuration;
 using UnityEngine;
 
@@ -24,6 +25,8 @@ public class Plugin : BaseUnityPlugin
         Config.Bind("Debug", "TestKey", KeyCode.K, "Test key capture.");
         Config.Bind("Debug", "Speed", 1.5f, new ConfigDescription("Test float slider.", new AcceptableValueRange<float>(0.5f, 3f)));
         Config.Bind("Debug", "Name", "Karma", "Test string (display only).");
+        DevConsole.Key = Config.Bind("General", "ConsoleKey", KeyCode.F2, "Open the console.");
+        gameObject.AddComponent<DevConsole>();
         harmony = new Harmony("ch.aogirikarma.ifsclmods");
         harmony.PatchAll();
         Lang.OptionName("mods", "Mods", "Mods", "Mod", "Mods", "Mody", "Mods");
