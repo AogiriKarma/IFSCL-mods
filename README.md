@@ -85,7 +85,7 @@ Keys are global across mods, prefix them if you fear collisions.
 ## Build
 
 ```
-dotnet build
+cd src && dotnet build
 ```
 
 The csproj references the game DLLs through the `Game` property; adjust its path to your install. Build output is copied to `BepInEx/scripts/` for use with [ScriptEngine](https://github.com/BepInEx/BepInEx.Debug) hot reload during development.
