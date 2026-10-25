@@ -25,8 +25,12 @@ static class ModConfigSliders
 
         var layout = container.GetComponent<Menu_AudioLayout>();
         group = layout.sliderGroup;
-        if (layout.buttonLine50 != null) UnityEngine.Object.Destroy(layout.buttonLine50.gameObject);
-        UnityEngine.Object.Destroy(layout); // its Awake would spawn the four audio sliders
+        if (layout.buttonLine50 != null) UnityEngine.Object.DestroyImmediate(layout.buttonLine50.gameObject);
+        // Immediate, not deferred: the clone carries copies of the real audio sliders (bound to the
+        // game's volume options) and a Menu_AudioLayout whose Awake would spawn four more. A deferred
+        // Destroy lets their OnEnable run when the container is activated below, writing the volumes.
+        UnityEngine.Object.DestroyImmediate(layout);
+        for (int i = group.childCount - 1; i >= 0; i--) UnityEngine.Object.DestroyImmediate(group.GetChild(i).gameObject);
     }
 
     static void Rebuild()
