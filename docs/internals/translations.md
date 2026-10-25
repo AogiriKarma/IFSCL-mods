@@ -1,9 +1,9 @@
-# Traductions
+# Translations
 
-Assembly `Translations`. Trois couches :
+Assembly `Translations`. Three layers:
 
-- `Row` : un id + six langues (en, fr, it, es, pl, pt). Stocke, ne décide rien.
-- `DB` : une table par classe (`Words`, `OptionNames`, `OptionDescr`...), indexée par id, remplie dans le constructeur via `AddRow`.
-- `MSG` (IFSCL.Runtime) : applique les règles. Langue courante = `VarG.langage`. Une traduction `""` ou `"-"` retombe sur l'anglais. Id inconnu → `NOTFOUND : id` affiché tel quel, jamais d'exception.
+- `Row`: one id plus six languages (en, fr, it, es, pl, pt). Stores, decides nothing.
+- `DB`: one table per class (`Words`, `OptionNames`, `OptionDescr`...), indexed by id, filled in the constructor through `AddRow`.
+- `MSG` (IFSCL.Runtime): applies the rules. Current language is `VarG.langage`. A translation equal to `""` or `"-"` falls back to English. Unknown id → `NOTFOUND : id` displayed as is, never an exception.
 
-Règle d'Immudelki : l'anglais est obligatoire, le reste optionnel.
+Immudelki's rule: English is mandatory, the rest is optional.

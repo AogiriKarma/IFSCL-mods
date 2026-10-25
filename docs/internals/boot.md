@@ -1,8 +1,8 @@
-# Démarrage du jeu
+# Game startup
 
-Point d'entrée : `GamePreInit` (IFSCL.Runtime). Deux vagues de chargement :
+Entry point: `GamePreInit` (IFSCL.Runtime). Two loading waves:
 
-1. `AfterAssembliesLoaded` : tables de référence statiques (`XxxList.PRE_LOAD()`).
-2. `AfterSceneLoad` → `LoadAll()` : fichiers de contenu en async, seconde vague de `PRE_LOAD`, puis `fullyLoaded = true`.
+1. `AfterAssembliesLoaded`: static reference tables (`XxxList.PRE_LOAD()`).
+2. `AfterSceneLoad` → `LoadAll()`: content files loaded async, a second wave of `PRE_LOAD`, then `fullyLoaded = true`.
 
-C'est sur `AfterSceneLoad` que BepInEx est accroché (voir README, entrypoint).
+BepInEx hooks `AfterSceneLoad` (see the README, entrypoint section).

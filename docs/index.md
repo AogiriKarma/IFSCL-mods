@@ -1,6 +1,6 @@
 # IFSCL Mods
 
-Notes de modding pour IFSCL (BepInEx 5, Harmony). Deux parties :
+Modding notes for IFSCL (BepInEx 5, Harmony). Two parts:
 
-- **Internals** : comment le jeu est construit, en prose. Pas de code décompilé ici.
-- **API** : ce que le plugin expose aux moddeurs (à venir).
+- **Internals**: how the game is built, in prose. No decompiled code here.
+- **API**: what the plugin exposes to modders (coming).

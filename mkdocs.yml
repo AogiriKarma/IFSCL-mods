@@ -14,7 +14,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.highlight
 nav:
-  - Accueil: index.md
+  - Home: index.md
   - Internals:
-      - Démarrage du jeu: internals/boot.md
-      - Traductions: internals/translations.md
+      - Game startup: internals/boot.md
+      - Translations: internals/translations.md
